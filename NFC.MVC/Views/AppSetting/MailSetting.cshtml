@@ -1,0 +1,143 @@
+﻿@model BSMediator.Core.Models.AppSettingMail
+@using BSMediator.FrontEnd.ResourceFiles
+@using BSMediator.Core.Models
+@{
+    ViewData["Title"] = "MailSetting";
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card-box">
+            <h4 class="header-title">@UI.AppSettingMail</h4>
+
+            <div class="row">
+                <div class="col-12">
+                    <div>
+                        <form asp-action="MailSetting">
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                            <div class="form-group">
+                                <label asp-for="Host" class="control-label"></label>
+                                <input asp-for="Host" class="form-control" />
+                                <span asp-validation-for="Host" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="Password" class="control-label"></label>
+                                <input asp-for="Password" class="form-control" />
+                                <span asp-validation-for="Password" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="Port" class="control-label"></label>
+                                <input asp-for="Port" class="form-control" />
+                                <span asp-validation-for="Port" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label asp-for="mailForm" class="control-label"></label>
+                                <input asp-for="mailForm" class="form-control" />
+                                <span asp-validation-for="mailForm" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <input type="submit" value="Save" class="btn btn-primary" />
+                            </div>
+
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+        <!-- end row -->
+
+    </div> <!-- end card-box -->
+
+</div><!-- end col -->
+<div class="row">
+
+    <!-- Right Sidebar -->
+    <div class="col-lg-12">
+        <div class="card-box">
+            <h4 class="header-title">@UI.TestingMailSetting</h4>
+            <div>
+
+                <div class="mt-4">
+
+                    <div class="form-group">
+                        <input type="email" id="to" class="form-control" placeholder="@UI.MailTo">
+                    </div>
+
+                    <div class="form-group">
+                        <input type="text" id="subject" class="form-control" placeholder="@UI.Subject">
+                    </div>
+                    <div class="form-group">
+                        <div id="editor" class="summernote">
+                        </div>
+                    </div>
+
+                    <div class="form-group mb-0">
+                        <div class="text-right">
+                            <button onclick="SendMail()" class="btn btn-primary  waves-effect waves-light"> <span>@UI.SendTestMail</span> <i class="mdi mdi-send ml-1"></i> </button>
+                        </div>
+                    </div>
+
+                </div> <!-- end card-->
+
+            </div>
+
+            <div class="clearfix"></div>
+        </div>
+
+    </div> <!-- end Col -->
+
+</div><!-- End row -->
+<script>
+    function SendMail() {
+        debugger;
+        document.getElementsByClassName("note-btn btn btn-light btn-sm btn-codeview")[0].click();
+        document.getElementsByClassName("note-btn btn btn-light btn-sm btn-codeview active")[0].click();
+        var htmlstr = document.getElementsByClassName("note-codable")[0].value;
+
+        var Subject = document.getElementById("subject").value;
+        var to = document.getElementById("to").value;
+        var element = {}
+        element.to = to; element.Subject = Subject; element.body = htmlstr;
+        $.ajax({
+            url: "/AppSetting/SendMail",
+            async: false,
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            type: "POST",
+            data: JSON.stringify(element),
+            success: function (data) {
+
+                if (data == true) {
+                  //document.getElementById("to").value='';
+                  //document.getElementsByClassName("note-codable")[0].value='';
+                  //document.getElementById("subject").value='';
+                    swal({
+                        title:'@UI.SuccessfulMessage',
+                        text: '@UI.MailSent',
+                        icon: "successful",
+                        button: '@UI.Ok',
+                    });
+                }
+                else swal({
+                    title: '@UI.Error',
+                    text: '@UI.SendingMailFeild',
+                    icon: "error",
+                    button: '@UI.Ok',
+                });
+            },
+
+        });
+    }
+</script>
+<div>
+    <a asp-controller="Home" asp-action="Index">@UI.HomeLink</a>
+</div>
+
+@section Scripts {
+    @{
+    await Html.RenderPartialAsync("_ValidationScriptsPartial");
+}
+}

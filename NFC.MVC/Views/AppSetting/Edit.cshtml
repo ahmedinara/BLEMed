@@ -1,0 +1,371 @@
+﻿@model BSMediator.Core.Models.AppSettingUrl
+@using BSMediator.FrontEnd.ResourceFiles
+@{
+    ViewData["Title"] = "Edit";
+}
+<style>
+    input[type=radio] {
+        width: 15px;
+        height: 15px;
+    }
+</style>
+<div class="row">
+    <div class="col-12">
+        <div class="card-box">
+            <h4 class="header-title">@UI.IntegrationSystemSetting</h4>
+            <input id="systemType" value="" hidden>
+
+            <div class="row">
+                <div class="col-12">
+                    <div>
+                        <div class="form-horizontal">
+
+                            <div class="form-group row">
+                                <label class="col-md-2 col-form-label">@UI.SystemType</label>
+                                <div class="col-md-10">
+                                    <select class="form-control" onchange="ChnageSystemType()" id="ListSystemType">
+                                        <option value='0'>@UI.SelectMessageUser </option>
+                                        <option value='1'> BioTime </option>
+                                        <option value='2'> BioSecurity </option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div id="divconn" class="form-group row">
+                                <label class="col-md-2 col-form-label">@UI.IntegrationMethod</label>
+                                <div class="col-md-10">
+                                    <select class="form-control" onchange="SwitchConnType()" id="connType">
+                                        <option value='0'>@UI.SelectMessageUser </option>
+                                        <option value='1'> MSql DB </option>
+                                        <option value='2'> Api </option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div id="divapi" style="display:none">
+                                <div class="form-group row">
+                                    <label for="ApplictionUrl" class="col-md-2 col-form-label">@UI.ApplictionUrl</label>
+                                    <div class="col-md-10">
+                                        <input id="ApplictionUrl" class="form-control">
+                                        <span style="display:none" validation-for="ApplictionUrl" id="valdurl" class="text-danger help-block">@UI.ApplicationUrlRequired</span>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="ApplicationPort" class="col-md-2 col-form-label">@UI.ApplicationPort</label>
+                                    <div class="col-md-10">
+                                        <input id="ApplicationPort" class="form-control">
+                                        <span style="display:none" alion-for="ApplicationPort" id="valdPort" class="text-danger help-block">@UI.PortRequired</span>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="UserNameUrl" class="col-md-2 col-form-label">@UI.UserName</label>
+                                    <div class="col-md-10">
+                                        <input id="UserNameUrl" class="form-control">
+                                        <span style="display:none" validation-for="UserNameUrl" id="valdUserNameUrl" class="text-danger help-block">@UI.UserNameRequired</span>
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label for="PasswordUrl" class="col-md-2 col-form-label">@UI.Password</label>
+                                    <div class="col-md-10">
+                                        <input type="passwordUrl" id="PasswordUrl" class="form-control">
+                                        <span style="display:none" validation-for="PasswordUrl" id="valdPasswordUrl" class="text-danger help-block">@UI.PasswordRequired</span>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div id="divsql" style="display:none">
+                                <div validation-summary="ModelOnly" class="text-danger"></div>
+                                <div class="form-group row">
+                                    <label for="ServerName" class="col-md-2 col-form-label">@UI.ServerName</label>
+                                    <div class="col-md-10">
+                                        <input id="ServerName" class="form-control">
+                                        <span style="display:none" validation-for="ServerName" id="valdServerName" class="text-danger help-block">@UI.ServerNameRequired</span>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="DataBaseName" class="col-md-2 col-form-label">@UI.DataBaseName</label>
+                                    <div class="col-md-10">
+                                        <input id="DataBaseName" class="form-control">
+                                        <span style="display:none" validation-for="DataBaseName" id="valdDataBaseName" class="text-danger help-block">@UI.DataBaseNameRequired</span>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="UserName" class="col-md-2 col-form-label">@UI.UserName</label>
+                                    <div class="col-md-10">
+                                        <input id="UserName" class="form-control">
+                                        <span style="display:none" validation-for="UserName" id="valdUserName" class="text-danger help-block">@UI.UserNameRequired</span>
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label for="Password" class="col-md-2 col-form-label">@UI.Password</label>
+                                    <div class="col-md-10">
+                                        <input type="password" id="Password" class="form-control">
+                                        <span style="display:none" validation-for="Password" id="valdPassword" class="text-danger help-block">@UI.PasswordRequired</span>
+                                    </div>
+                                </div>
+
+
+                            </div>
+                            <button type="button" onclick="SubmitForm()" class="btn btn-primary">@UI.SaveChangesBtn</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <!-- end row -->
+
+        </div> <!-- end card-box -->
+    </div><!-- end col -->
+</div>
+
+<script>
+    function SubmitForm(){
+        let text;
+        var element = {};var dt=[];var x={};
+        debugger;
+       if(document.getElementById("ListSystemType").value==0)
+       {
+           return;
+       }
+        element.SystemType=document.getElementById("ListSystemType").value;
+
+        if(document.getElementById("connType").value == '1')
+        {
+          element.ConnectionType='1';
+          x ={};
+          x.key='ServerName';
+          x.value=document.getElementById("ServerName").value;
+          if(x.value=='')
+          {
+             document.getElementById("valdServerName").style.display = "block";
+             return;
+          }
+          else
+          document.getElementById("valdServerName").style.display = "none";
+          dt.push(x);
+           x ={};
+          x.key='DataBaseName';
+          x.value=document.getElementById("DataBaseName").value;
+           if(x.value=='')
+          {
+              document.getElementById("valdDataBaseName").style.display = "block";
+
+              return;
+          }
+           else
+              document.getElementById("valdServerName").style.display = "none";
+
+          dt.push(x);
+           x ={};
+          x.key='UserName';
+          x.value=document.getElementById("UserName").value;
+           if(x.value=='')
+          {
+              document.getElementById("valdUserName").style.display = "block";
+              return;
+          }
+           else
+          document.getElementById("valdUserName").style.display = "none";
+
+          dt.push(x);
+           x ={};
+          x.key='Password';
+          x.value=document.getElementById("Password").value;
+           if(x.value=='')
+          {
+              document.getElementById("valdPassword").style.display = "block";
+
+              return;
+          }
+           else
+                     document.getElementById("valdPassword").style.display = "none";
+
+          $("valdPassword").css("display", "none");
+          dt.push(x);
+          element.dt=dt;
+        }
+        else
+        {
+           element.ConnectionType='2';
+           x ={};
+          x.key='Url';
+          x.value=document.getElementById("ApplictionUrl").value;
+            if(x.value=='')
+          {
+              document.getElementById("valdurl").style.display = "block";
+              return;
+          }
+           else
+             document.getElementById("valdurl").style.display = "none";
+
+          dt.push(x);
+           x ={};
+          x.key='Port';
+          x.value=document.getElementById("ApplicationPort").value;
+            if(x.value=='')
+          {
+              document.getElementById("valdPort").style.display = "block";
+              return;
+          }
+           else
+          document.getElementById("valdPort").style.display = "none";
+          dt.push(x);
+          x ={};
+          x.key='UserName';
+          x.value=document.getElementById("UserNameUrl").value;
+           if(x.value=='')
+          {
+              document.getElementById("valdUserNameUrl").style.display = "block";
+              return;
+          }
+           else
+          document.getElementById("valdUserNameUrl").style.display = "none";
+
+          dt.push(x);
+           x ={};
+          x.key='Password';
+          x.value=document.getElementById("PasswordUrl").value;
+           if(x.value=='')
+          {
+              document.getElementById("valdPasswordUrl").style.display = "block";
+
+              return;
+          }
+           else
+          document.getElementById("valdPasswordUrl").style.display = "none";
+
+          $("valdPasswordUrl").css("display", "none");
+          dt.push(x);
+          element.dt=dt;
+
+        }
+
+        $.ajax({
+            url: "/AppSetting/PostData",
+            async: false,
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            type: "POST",
+            data: JSON.stringify(element),
+            success: function (data) {
+
+                if (data == "1") {
+                  document.getElementById("myForm").submit();
+                    swal({
+                        title: '@UI.SuccessfulMessage',
+                        text: "@UI.SuccessfulMessage",
+                        icon: "success",
+                        button: "@UI.Ok",
+                    });
+
+                }
+                else swal(' @UI.ErrorMessage !!! ', 'error');
+            },
+
+        });
+                            window.location.href = "/setting/integrationSystem";
+
+    }
+
+    function SwitchConnType(){
+
+         if(document.getElementById("connType").value==2)
+        {
+             document.getElementById("divsql").style.display = "none";
+             document.getElementById("divapi").style.display = "block";
+        }
+        else if (document.getElementById("connType").value==1)
+        {
+               document.getElementById("divsql").style.display = "block";
+               document.getElementById("divapi").style.display = "none";
+        }
+        else
+        {
+           document.getElementById("divsql").style.display = "none";
+           document.getElementById("divapi").style.display = "none";
+        }
+    }
+    function ChnageSystemType(){
+        if(document.getElementById("ListSystemType").value==0)
+        {
+          document.getElementById("divconn").style.display = "none";
+        }
+        else
+        {
+          document.getElementById("divconn").style = "";
+        }
+
+         GetData(document.getElementById("ListSystemType").value);
+    }
+
+    function ClearData(){
+
+        document.getElementById("divsql").style.display = "none";
+        document.getElementById("divapi").style.display = "none";
+        document.getElementById("ServerName").value='';
+        document.getElementById("DataBaseName").value='';
+        document.getElementById("UserName").value='';
+        document.getElementById("Password").value='';
+        document.getElementById("ApplictionUrl").value='';
+        document.getElementById("ApplicationPort").value='';
+        document.getElementById("systemType").value='';
+        document.getElementById("connType").value=0;
+        //document.getElementById("ListSystemType").value=0;
+    }
+    function GetData(type){
+
+            ClearData();
+            $.ajax({
+            type: 'GET',
+            url: "/AppSetting/GetData?systemType="+type,
+            contentType: "text/plain",
+            dataType: 'json',
+            success: function (data) {
+                if(data != null)
+                {
+                    if(data.SystemType != null)
+                    {
+                     document.getElementById("ListSystemType").value=  parseInt(data.SystemType);
+                    }
+
+                     if(data.ConnectionType =="1")
+                    {
+                       document.getElementById("connType").value=1;
+                       document.getElementById("divsql").style.display = "block";
+                       document.getElementById("divapi").style.display = "none";
+
+                       document.getElementById("ServerName").value=data.dt.find(obj => {return obj.Key === 'ServerName'}).Value;
+                       document.getElementById("DataBaseName").value=data.dt.find(obj => {return obj.Key ==='DataBaseName'}).Value;
+                       document.getElementById("UserName").value=data.dt.find(obj => {return obj.Key === 'UserName'}).Value;
+                       document.getElementById("Password").value=data.dt.find(obj => {return obj.Key ==='Password'}).Value;
+                       document.getElementById("systemType").value="1";
+
+                    }
+                    else if(data.ConnectionType == "2")
+                    {
+                       document.getElementById("connType").value=2;
+                       var divapi = document.getElementById("divapi");
+                       divapi.style.display = "block";
+                       var divsql = document.getElementById("divsql");
+                       divsql.style.display = "none";
+                       document.getElementById("ApplictionUrl").value=data.dt.find(obj => {return obj.Key === 'Url'}).Value;
+                       document.getElementById("ApplicationPort").value=data.dt.find(obj => {return obj.Key === 'Port'}).Value;
+                        document.getElementById("UserNameUrl").value=data.dt.find(obj => {return obj.Key === 'UserName'}).Value;
+                       document.getElementById("PasswordUrl").value=data.dt.find(obj => {return obj.Key ==='Password'}).Value;
+                       document.getElementById("systemType").value="2";
+                    }
+                }
+
+            }
+        });
+    }
+        $(document).ready(function () {
+            GetData(null);
+        });
+
+</script>
+@section Scripts {
+    @{
+    await Html.RenderPartialAsync("_ValidationScriptsPartial");
+}
+}

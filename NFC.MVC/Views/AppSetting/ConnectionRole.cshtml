@@ -1,0 +1,138 @@
+﻿ @using BSMediator.FrontEnd.ResourceFiles
+
+<div class="row">
+    <div class="col-12">
+        <div class="card-box">
+            <h4 class="header-title">@UI.CommunicationRules</h4>
+            <p class="sub-header">
+               @UI.CommunicationTitle
+            </p>
+
+            <div class="table-responsive">
+                <table id="table" class="table table-bordered table-striped mb-0">
+                    <thead>
+                        <tr id="tbaleheader">
+                        </tr>
+                    </thead>
+                    <tbody id="tblbody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <button type="button" onclick="SubmitForm()" class="btn btn-primary">@UI.SaveChangesBtn</button>
+    </div>
+</div>
+<script>
+          function GetData(){
+                $.ajax({
+                type: 'GET',
+                url: "/AppSetting/ConnectionRoleData",
+                contentType: "text/plain",
+                dataType: 'json',
+                success: function (data) {
+                    if(data != null)
+                    {
+                        var html="<th>Action</th>";
+                         for (const element of data.ConnectionOptions) {
+                             html +="<th>"+element.Name+"</th>";
+                          }
+                       $("#tbaleheader").append(html);
+                       html=null;
+                        for (const CommRole of data.CommRoleModels) {
+                             html +="<tr><td>"+CommRole.ActionName+"</td>";
+                             for (const detial of CommRole.commRoleDetials){
+                                 if(detial.IsActive)
+                                  html +="<td><input type='checkbox' value='"+detial.TypeId+"' checked name='name1' />&nbsp;</td>";
+                                  else
+                                  html +="<td><input type='checkbox' value='"+detial.TypeId+"'  name='name1' />&nbsp;</td>";
+                             }
+                             html+="</tr>";
+                          }
+                          $("#tblbody").append(html);
+                           html=null;
+
+                    }
+
+                }
+            });
+        }
+            $(document).ready(function () {
+                GetData();
+            });
+     function SubmitForm(){
+                 debugger;
+                 var oTable = document.getElementById('tblbody');
+                 var element=[];
+                 var listItem =[];
+    var rowLength = oTable.rows.length;
+
+    for (i = 0; i < rowLength; i++){
+
+       var oCells = oTable.rows.item(i).cells;
+
+       var cellLength = oCells.length;
+                 var parent={};
+                 listItem=[];
+       for(var j = 0; j < cellLength; j++){
+          var anser={};
+           var dd = oCells.item(j).innerHTML;
+          if(dd.search("<input")>-1)
+         {
+            var cellVal = oCells.item(j).children[0];
+
+           if(cellVal.type=="checkbox")
+           {
+               if(cellVal.checked)
+               {
+                   anser.IsActive=true;
+                   anser.TypeId=cellVal.value;
+                   listItem.push(anser)
+
+               }
+               else{
+                    anser.IsActive=false;
+                   anser.TypeId=cellVal.value;
+                   listItem.push(anser)
+               }
+           }
+         }
+         else{
+             parent.ActionName=dd;
+         }
+         
+       }
+                parent.commRoleDetials=listItem;
+
+                element.push(parent);
+                                 listItem=[];
+
+
+    }
+
+            $.ajax({
+                url: "/AppSetting/PostConnectionRole",
+                async: false,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                type: "POST",
+                data: JSON.stringify(element),
+                success: function (data) {
+
+                    if (data == "1") {
+                      document.getElementById("myForm").submit();
+                        swal({
+                        title: '@UI.SuccessfulMessage',
+                        text: "@UI.SuccessfulMessage",
+                        icon: "success",
+                        button: "@UI.Ok",
+                    });
+
+                    }
+                    else swal(' @UI.ErrorMessage !!! ', 'error');
+                },
+
+            });
+                                window.location.href = "/setting/connectionRole";
+
+        }
+</script>

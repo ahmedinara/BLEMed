@@ -1,0 +1,170 @@
+﻿@model IEnumerable<BSMediator.Core.Models.Datum>
+@using BSMediator.FrontEnd.ResourceFiles;
+@using System.Globalization;
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card-box">
+            <h4 class="header-title">@UI.SearchTitle</h4>
+            @*<p class="sub-header">
+                    You may also swap <code class="highlighter-rouge">.row</code> for <code class="highlighter-rouge">.form-row</code>, a variation of our standard grid row that overrides the default column gutters for tighter and more compact layouts.
+                </p>*@
+
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="inputEmail4" class="col-form-label">@UI.lblfristname</label>
+                    <input class="form-control" id="lblfristname">
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="inputEmail4" class="col-form-label">@UI.lbllastname</label>
+                    <input class="form-control" id="lbllastname">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="inputEmail4" class="col-form-label">@UI.lbldepartment</label>
+                    <input class="form-control" id="lbldepartment">
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="inputEmail4" class="col-form-label">@UI.lblempyCode</label>
+                    <input class="form-control" id="lblempyCode">
+                </div>
+
+            </div>
+
+            <button onclick="GetData(false)" class="btn btn-primary">@UI.BntSearch</button>
+            <button onclick="GetData(true)" class="btn btn-danger">@UI.btnClear</button>
+
+        </div>
+        <div class="card-box table-responsive">
+            <h1 class="header-title">@UI.EmployeesList</h1>
+
+            <table id="tbl" class="table table-striped table-bordered dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+                <thead>
+                    <tr>
+                        <th>
+                            @Html.DisplayNameFor(model => model.emp_code)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.first_name)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.last_name)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.nickname)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.mobile)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.email)
+                        </th>
+
+                        <th>
+                            @Html.DisplayNameFor(model => model.card_no)
+                        </th>
+                       
+                        <th></th>
+                    </tr>
+                </thead>
+
+            </table>
+        </div>
+    </div>
+</div>
+
+@*<script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>*@
+@*<script src="https://code.jquery.com/jquery-3.5.1.js"></script>*@
+
+
+    <script>
+        function GetData(isClear) {
+            if (isClear) {
+                document.getElementById("lblempyCode").value = '';
+                document.getElementById("lblfristname").value = '';
+                document.getElementById("lbllastname").value = '';
+                document.getElementById("lbldepartment").value = '';
+            }
+            var employecode = document.getElementById("lblempyCode").value;
+            var fristname = document.getElementById("lblfristname").value;
+            var lastname = document.getElementById("lbllastname").value;
+            var department = document.getElementById("lbldepartment").value;
+            $("#tbl").DataTable({
+                serverSide: true,
+                responsive: true,
+                processing: true,
+                async: false,
+                destroy: true,
+                searching: false,
+                ajax: {
+                    type: "post",
+                    url: "/User/GetData?emp_code=" + employecode + "&first_name=" + fristname + "&last_name=" + lastname + "&department=" + department + "",
+                    dataType: "json",
+                },
+                columns: [
+                    { data: "emp_code", name: "emp_code", responsivePriority: 1 },
+                    { data: "first_name", name: "first_name", responsivePriority: 2 },
+                    { data: "last_name", name: "last_name", responsivePriority: 3 },
+                    { data: "nickname", name: "nickname", responsivePriority: 4 },
+                    { data: "mobile", name: "mobile", responsivePriority: 5 },
+                    { data: "email", name: "email", responsivePriority: 6 },
+                    { data: "card_no", name: "card_no", responsivePriority: 7 },
+
+                    {
+                        data: null, orderable: false, width: "7%", responsivePriority: 2, render: function (data, type, row, dataIndex) {
+                            return "<div><a class='fa fa-edit' style='font-size: x-large' href='User/Details/" + data.id + "' ></a></div>";
+                        }
+                    }
+                ],
+                  "language": {
+                    "search": "@UI.Search :",
+                    "info": "@UI.Showing _START_ @UI.to _END_ @UI.of _TOTAL_ @UI.entries ",
+                    "infoEmpty": "@UI.Showing 0 @UI.to 0 @UI.of  0 @UI.entries",
+                    "infoFiltered": "(@UI.FilteredFrom  _MAX_ @UI.TotalData)",
+                    "infoPostFix": "",
+                    "lengthMenu": "@UI.Showing _MENU_ @UI.entries",
+                    "loadingRecords": "@UI.LoadingData",
+                    "processing": "@UI.Processing",
+                    "zeroRecords": "@UI.zeroRecords",
+                    "paginate": {
+                        "first": "@UI.first",
+                        "last": "@UI.last",
+                        "next": "@UI.next",
+                        "previous": "@UI.previous"
+                    }
+                }
+                , lengthChange: !1, buttons: ["copy", "excel", "pdf", "colvis"],
+
+            });
+            $("#key-table").DataTable({ keys: !0 }), $("#responsive-datatable").DataTable(),
+                $("#selection-datatable").DataTable({ select: { style: "multi" } }),
+                a.buttons().container().appendTo("#tbl_wrapper .col-md-6:eq(0)")
+        }
+
+        $(document).ready(function () {
+            GetData(true);
+        });
+
+        function build_edit_form(index) {
+            $.ajax({
+                url: "/User/GetDataById",
+                async: false,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                type: "POST",
+                data: JSON.stringify(index),
+                success: function (data) {
+
+
+                },
+
+            });
+        }
+    </script>
+
+

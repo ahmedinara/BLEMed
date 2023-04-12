@@ -1,0 +1,104 @@
+﻿@model BSMediator.Core.Models.Datum
+@using BSMediator.FrontEnd.ResourceFiles;
+
+@{
+    ViewData["Title"] = "Detials";
+}
+
+<div class="card-box">
+    <h4 class="header-title mt-0 mb-4">@UI.UserInformation</h4>
+    <div class="panel-body">
+        @*<p class="text-muted font-13">
+            Hye, I’m Johnathan Doe residing in this beautiful world. I create websites and mobile apps with great UX and UI design. I have done work with big companies like Nokia, Google and Yahoo. Meet me or Contact me for any queries. One Extra line for filling space. Fill as many you want.
+        </p>*@
+
+        <hr />
+<input hidden id="userId" value="@Html.DisplayFor(model => model.id)" />
+<div class="text-left">
+    <p class="text-muted font-13"><strong>@Html.DisplayNameFor(model => model.first_name) :</strong> <span class="ml-3">@Html.DisplayFor(model => model.first_name)</span></p>
+
+    <p class="text-muted font-13"><strong>@Html.DisplayNameFor(model => model.last_name) :</strong><span class="ml-3">@Html.DisplayFor(model => model.last_name)</span></p>
+
+    <p class="text-muted font-13"><strong>@Html.DisplayNameFor(model => model.mobile) :</strong> <span class="ml-3">@Html.DisplayFor(model => model.mobile)</span></p>
+           <p class="text-muted font-13"><strong>@Html.DisplayNameFor(model => model.email) :</strong> <span class="ml-3">@Html.DisplayFor(model => model.email)</span></p>
+
+    <p class="text-muted font-13"><strong>@Html.DisplayNameFor(model => model.card_no) :</strong> <span class="ml-3">@Html.DisplayFor(model => model.card_no)</span></p>
+
+    <div id="cardNo" style="display:none">
+        <p class="text-muted font-13"><strong>@UI.EncriptedCardNo :</strong> <span class="ml-3" id="cardNoValue"></span></p>
+    </div>
+</div>
+        <button class="btn btn-pink" id="toastr-three"  onclick="btngenrateCode()">@UI.GenrateCode</button>
+    </div>
+</div>
+@*<div class="container justify-content-center">
+    <h1 class="text-blue text-center">Detials</h1>
+
+    <div>
+        <h4>User</h4>
+
+        <input type="button" onclick="ShowCard()" value="Generate Password" class="btn btn-primary" />
+        <dl class="row">
+
+
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.mobile)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.mobile)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.email)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.email)
+            </dd>
+
+            <dt id="CardTitele" style="display:none" class="col-sm-2">
+                @Html.DisplayNameFor(model => model.card_no)
+            </dt>
+            <dd id="CradValue" style="display:none" class="col-sm-10">
+                @Html.DisplayFor(model => model.card_no)
+            </dd>
+
+        </dl>
+    </div>
+    <div>
+
+    </div>
+
+
+
+
+
+    @Html.ActionLink("Edit", "Edit", new { /* id = Model.PrimaryKey */ }) |
+    <a asp-action="Index">Back to List</a>
+</div>*@
+<script>
+    function btngenrateCode() {
+        $.ajax({
+            url: "/User/GetCardKey?id=" + document.getElementById("userId").value,
+           async: false,
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            type: "Get",
+            success: function (data) {
+
+                if (data != "0") {
+
+                    $("#cardNo").css("display", "block");
+                    document.getElementById("cardNoValue").innerHTML = data.CardNoKey;
+                    document.getElementById("toastr-three").remove();
+                }
+                else swal({
+                    title: '@UI.Error',
+                    text: "@UI.ErrorMessage",
+                    icon: "error",
+                    button: "@UI.Ok",
+                });
+            },
+
+        });
+
+    }
+</script>

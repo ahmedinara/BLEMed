@@ -1,0 +1,161 @@
+﻿@model IEnumerable<BSMediator.Core.Entities.UserAction>
+@using BSMediator.FrontEnd.ResourceFiles;
+@using System.Globalization;
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card-box">
+            <h4 class="header-title">@UI.SetUserPermission</h4>
+            @*<p class="sub-header">
+                You may also swap <code class="highlighter-rouge">.row</code> for <code class="highlighter-rouge">.form-row</code>, a variation of our standard grid row that overrides the default column gutters for tighter and more compact layouts.
+                </p>*@
+
+            <div class="form-row">
+
+                <div class="form-group col-md-6">
+                    <label for="inputEmail4" class="col-form-label">@UI.SelectUser</label>
+                    <select name="CategoryId" class="form-control" asp-items="@ViewBag.Users" onchange="ChangeUser()" id="CategoryId">
+                    </select>
+                    <span style="display:none" validation-for="CategoryId" id="valdUser" class="text-danger help-block">@UI.UserNameRequired</span>
+
+                </div>
+
+            </div>
+
+            @* <button onclick="GetData(false)" class="btn btn-primary">@UI.BntSearch</button>
+                <button onclick="GetData(true)" class="btn btn-danger">@UI.btnClear</button>*@
+
+        </div>
+        <div class="card-box table-responsive">
+            <h1 class="header-title">@UI.EmployeesList</h1>
+
+            <table id="tbl" class="table table-striped table-bordered dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+                <thead>
+                    <tr>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Action.ActionName)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.IsActive)
+                        </th>
+                    </tr>
+                </thead>
+                <tbody id="tblbody">
+                </tbody>
+            </table>
+            <button type="button" onclick="PostData()" class="btn btn-primary">@UI.SaveChangesBtn</button>
+
+            <a href=""></a>
+        </div>
+    </div>
+</div>
+<script>
+    function GetData() {
+         $("#tblbody").empty();
+         var employecode = $("#CategoryId").val();
+         if (employecode != '' || employecode != '0') {
+
+             debugger;
+             $.ajax({
+                 type: 'GET',
+                 url: "/Action/GetData?userId=" + employecode + "",
+                 contentType: "text/plain",
+                 dataType: 'json',
+                 success: function (data) {
+                     if (data != null) {
+                         var html = "";
+                         for (const dt of data) {
+                             html += "<tr><td>" + dt.ActionName + "</td>";
+                             if (dt.IsActive)
+                                 html += "<td><input type='checkbox' value='" + dt.ActionId + "' checked name='name1' />&nbsp;</td>";
+                             else
+                                 html += "<td><input type='checkbox' value='" + dt.ActionId + "'  name='name1' />&nbsp;</td>";
+                             html += "</tr>";
+                         }
+                         $("#tblbody").append(html);
+                         html = null;
+                     }
+                 }
+             });
+         }
+
+     }
+
+     $(document).ready(function () {
+         GetData();
+
+     });
+     function ChangeUser() {
+         GetData();
+     }
+     function PostData() {
+         var usrId=$("#CategoryId").val();
+         var oTable = document.getElementById('tblbody');
+         var element = [];
+         var listItem = [];
+         var rowLength = oTable.rows.length;
+         for (i = 0; i < rowLength; i++) {
+
+             var oCells = oTable.rows.item(i).cells;
+
+             var cellLength = oCells.length;
+             var rowLength = oTable.rows.length;
+
+
+             for (var j = 0; j < cellLength; j++) {
+                 var anser = {};
+                 var dd = oCells.item(j).innerHTML;
+                 if (dd.search("<input") > -1) {
+                     var cellVal = oCells.item(j).children[0];
+
+                     if (cellVal.type == "checkbox") {
+                         if (cellVal.checked) {
+                             anser.IsActive = true;
+                         }
+                         else {
+                             anser.IsActive = false;
+                         }
+                          anser.ActionId = cellVal.value;
+                          anser.UserId=usrId;
+                          listItem.push(anser)
+                     }
+                 }
+
+
+             }
+         }
+          $.ajax({
+             url: "/Action/PostData",
+             async: false,
+             contentType: "application/json; charset=utf-8",
+             dataType: "json",
+             type: "POST",
+             data: JSON.stringify(listItem),
+             success: function (data) {
+
+                 if (data == "1") {
+
+                     swal({
+                        title: '@UI.SuccessfulMessage',
+                        text: "@UI.SuccessfulMessage",
+                        icon: "success",
+                        button: "@UI.Ok",
+                    });
+                     window.location.href = "/Action";
+
+
+                 }
+                 else swal(' @UI.ErrorMessage !!! ', 'error');
+             },
+
+         });
+
+     }
+</script>
+
+
+

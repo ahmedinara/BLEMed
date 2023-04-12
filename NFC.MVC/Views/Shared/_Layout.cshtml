@@ -1,0 +1,390 @@
+﻿@using Microsoft.Extensions.Localization;
+@using BSMediator.FrontEnd.ResourceFiles;
+@using Microsoft.AspNetCore.Http
+@using System.Globalization;
+@using NFC.Core.Enums;
+@inject BSMediator.Core.Services.Opreater.IActionService _action;
+
+
+@inject IHttpContextAccessor HttpContextAccessor
+@{
+    string returnUrl = ViewContext.HttpContext.Request.Path;
+
+    string UserName = HttpContextAccessor.HttpContext.Session.GetString("UserName");
+    string Type = HttpContextAccessor.HttpContext.Session.GetString("Type");
+    int userId = HttpContextAccessor.HttpContext.Session.GetString("UserId") == null ? 0 : int.Parse(HttpContextAccessor.HttpContext.Session.GetString("UserId"));
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>@UI.PageTitle</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta content="A fully featured admin theme which can be used to build CRM, CMS, etc." name="description" />
+    <meta content="Coderthemes" name="author" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <!-- App favicon -->
+    <link rel="shortcut icon" href="~/assets/images/favicon.ico">
+
+    <!-- C3 Chart css -->
+    <link href="~/assets/libs/c3/c3.min.css" rel="stylesheet" type="text/css" />
+    <!-- Summernote css -->
+    <link href="~/assets/libs/summernote/summernote-bs4.css" rel="stylesheet" type="text/css" />
+    <!-- App css -->
+    <link href="~/assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" id="bootstrap-stylesheet" />
+    <link href="~/assets/css/icons.min.css" rel="stylesheet" type="text/css" />
+    <!-- third party css -->
+    <link href="~/assets/libs/datatables/dataTables.bootstrap4.css" rel="stylesheet" type="text/css" />
+    <link href="~/assets/libs/datatables/buttons.bootstrap4.css" rel="stylesheet" type="text/css" />
+    <link href="~/assets/libs/datatables/responsive.bootstrap4.css" rel="stylesheet" type="text/css" />
+    <link href="~/assets/libs/sweetalert2/sweetalert2.min.css" rel="stylesheet" type="text/css" />
+    @if (CultureInfo.CurrentCulture.Name == "en-US")
+    {
+        <link href="~/assets/css/app.min.css" rel="stylesheet" type="text/css" id="app-stylesheet" />
+
+    }
+    else
+    {
+        <link href="~/assets/css/app-rtl.min.css" rel="stylesheet" type="text/css" id="app-stylesheet" />
+    }
+</head>
+
+<body>
+
+
+    <!-- Begin page -->
+    <div id="wrapper">
+
+
+        <!-- Topbar Start -->
+        <div class="navbar-custom">
+            <ul class="list-unstyled topnav-menu float-right mb-0">
+                <li class="dropdown notification-list">
+                    <a class="nav-link dropdown-toggle nav-user mr-0 waves-effect waves-light" data-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="false">
+                        @*<img src="~/assets/images/users/avatar-1.jpg" alt="user-image" class="rounded-circle">*@
+                        <i class="dripicons-user xl" style="font-size:22px;"></i>
+                        <span class="pro-user-name ml-1">
+                            @UserName  <i class="mdi mdi-chevron-down"></i>
+                        </span>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right profile-dropdown ">
+                        <!-- item-->
+                        <div class="dropdown-header noti-title">
+                            <h6 class="text-overflow m-0">@UI.Welcome !</h6>
+                        </div>
+                        <form class="form-horizontal" asp-controller="Home" asp-action="ChangeLanguage">
+                            <input hidden name="culture" value="ar-SA" />
+                            <input type="hidden" id="returnUrl" name="returnUrl" value="@returnUrl" />
+                            <button type="submit" class="dropdown-item notify-item">
+                                @if (CultureInfo.CurrentCulture.Name == "en-US")
+                                {
+                                    <img src="~/assets/images/flags/saudi-arabia.png" alt="lang-image" class="mr-1" height="12"> <span class="align-middle">@UI.langBtn</span>
+                                }
+                                else
+                                {
+                                    <img src="~/assets/images/flags/us.jpg" alt="lang-image" class="mr-1" height="12"> <span class="align-middle">@UI.langBtn</span>
+                                }
+                            </button>
+                        </form>
+                        <!-- item-->
+
+
+                        <div class="dropdown-divider"></div>
+
+                        <!-- item-->
+
+                        <a asp-controller="Auth" asp-action="Logout" class="dropdown-item notify-item">
+                            <i class="fe-log-out"></i>
+                            <span>@UI.Logout</span>
+                        </a>
+
+                    </div>
+                </li>
+            </ul>
+
+            <!-- LOGO -->
+            <div class="logo-box">
+                <a asp-controller="Home" asp-action="Index" class="logo text-center">
+                    <span class="logo-lg">
+                        <img src="~/assets/images/logo-light.png" alt="" height="25">
+                        <!-- <span class="logo-lg-text-light">UBold</span> -->
+                    </span>
+                    <span class="logo-sm">
+                        <!-- <span class="logo-sm-text-dark">U</span> -->
+                        <img src="~/assets/images/logo-sm.png" alt="" height="28">
+                    </span>
+                </a>
+            </div>
+
+            <ul class="list-unstyled topnav-menu topnav-menu-left m-0">
+                <li>
+                    <button class="button-menu-mobile waves-effect waves-light">
+                        <i class="fe-menu"></i>
+                    </button>
+                </li>
+
+                @*<li class="d-none d-sm-block">
+                    <form class="app-search">
+                    <div class="app-search-box">
+                    <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Search...">
+                    <div class="input-group-append">
+                    <button class="btn" type="submit">
+                    <i class="fe-search"></i>
+                    </button>
+                    </div>
+                    </div>
+                    </div>
+                    </form>
+                    </li>*@
+
+            </ul>
+        </div>
+
+        <!-- end Topbar -->
+        <!-- ========== Left Sidebar Start ========== -->
+        <div class="left-side-menu">
+
+            <div class="slimscroll-menu">
+
+                <!--- Sidemenu -->
+                <div id="sidebar-menu">
+
+                    <ul class="metismenu" id="side-menu">
+
+                        @*<li class="menu-title">@UI.NAVIGATION</li>*@
+                        @if (_action.CheckUserActionIsActive(userId,new int[] { (int)ActionEnum.Employee} ))
+                        {
+                            <li>
+                                <a href="javascript: void(0);">
+                                    <i class="fe-airplay"></i>
+                                    <span>@UI.Employees </span>
+                                    <span class="menu-arrow"></span>
+                                </a>
+                                <ul class="nav-second-level" aria-expanded="false">
+                                    <li><a asp-action="Index" asp-controller="User">@UI.EmployeesList</a></li>
+                                </ul>
+                            </li>
+
+                        }
+
+                        @if (_action.CheckUserActionIsActive(userId, new int[] { (int)ActionEnum.IntegrationSystemSetting} ))
+                        {
+                            <li>
+                                <a href="javascript: void(0);">
+                                    <i class="fas fa-server"></i>
+                                    <span> @UI.AppSetting</span>
+                                    <span class="menu-arrow"></span>
+                                </a>
+
+                                <ul class="nav-second-level" aria-expanded="false">
+                                    <li><a asp-action="Edit" asp-controller="AppSetting">@UI.IntegrationSystemSetting</a></li>
+
+                                </ul>
+
+                            </li>
+
+                        }
+                        @if(_action.CheckUserActionIsActive(userId,new int[] { (int)ActionEnum.UsersList,(int)ActionEnum.UserPermissions} ))
+                        {
+                             <li>
+                                <a href="javascript: void(0);">
+                                    <i class="fas fa-server"></i>
+                                    <span> @UI.Users</span>
+                                    <span class="menu-arrow"></span>
+                                </a>
+
+                                <ul class="nav-second-level" aria-expanded="false">
+                                    @if (_action.CheckUserActionIsActive(userId, new int[] { (int)ActionEnum.UsersList }))
+                                    {
+                                        <li><a asp-action="Index" asp-controller="UserAdmin">@UI.UsersList</a></li>
+                                    }
+                                    @if (_action.CheckUserActionIsActive(userId, new int[] { (int)ActionEnum.UserPermissions }))
+                                    {
+                                    <li><a asp-action="Index" asp-controller="Action">@UI.UserAction</a></li>
+                                    }
+                                </ul>
+
+                            </li>
+                       
+                            
+                        }
+                        @if (_action.CheckUserActionIsActive(userId,new int[] { (int)ActionEnum.CommunicationRules,(int)ActionEnum.MailSetting} ))
+                        {
+                             <li>
+                                <a href="javascript: void(0);">
+                                    <i class="fas fa-server"></i>
+                                    <span> @UI.CommunicationSettings</span>
+                                    <span class="menu-arrow"></span>
+                                </a>
+
+                                <ul class="nav-second-level" aria-expanded="false">
+                                    @if (_action.CheckUserActionIsActive(userId, new int[] { (int)ActionEnum.CommunicationRules}))
+                                    {
+                                        <li><a asp-action="ConnectionRole" asp-controller="AppSetting">@UI.CommunicationRules</a></li>
+
+                                    }
+                                    @if (_action.CheckUserActionIsActive(userId, new int[] {  (int)ActionEnum.MailSetting }))
+                                    {
+                                    <li><a asp-action="MailSetting" asp-controller="AppSetting">@UI.AppSettingMail</a></li>
+
+                                    }
+
+                                </ul>
+
+                            </li>
+                            
+                        }
+
+
+
+                    </ul>
+
+                </div>
+                <!-- End Sidebar -->
+
+                <div class="clearfix"></div>
+
+            </div>
+            <!-- Sidebar -left -->
+
+        </div>
+        <!-- Left Sidebar End -->
+        <!-- ============================================================== -->
+        <!-- Start Page Content here -->
+        <!-- ============================================================== -->
+        <!-- Vendor js -->
+        <script src="~/assets/js/vendor.min.js"></script>
+
+        <!--C3 Chart-->
+        <script src="~/assets/libs/d3/d3.min.js"></script>
+        <script src="~/assets/libs/c3/c3.min.js"></script>
+
+        <script src="~/assets/libs/echarts/echarts.min.js"></script>
+
+        <script src="~/assets/js/pages/dashboard.init.js"></script>
+
+        <!-- App js -->
+        <script src="~/assets/js/app.min.js"></script>
+        <!-- Required datatable js -->
+        <script src="~/assets/libs/datatables/jquery.dataTables.min.js"></script>
+        <script src="~/assets/libs/datatables/dataTables.bootstrap4.min.js"></script>
+        <!-- Buttons examples -->
+        <script src="~/assets/libs/datatables/dataTables.buttons.min.js"></script>
+        <script src="~/assets/libs/datatables/buttons.bootstrap4.min.js"></script>
+        <script src="~/assets/libs/jszip/jszip.min.js"></script>
+        <script src="~/assets/libs/pdfmake/pdfmake.min.js"></script>
+        <script src="~/assets/libs/pdfmake/vfs_fonts.js"></script>
+        <script src="~/assets/libs/datatables/buttons.html5.min.js"></script>
+        <script src="~/assets/libs/datatables/buttons.print.min.js"></script>
+        <script src="~/assets/libs/datatables/buttons.colVis.js"></script>
+        <!--Summernote js-->
+        <script src="~/assets/libs/summernote/summernote-bs4.min.js"></script>
+
+        <!-- Init js-->
+        <script src="~/assets/js/pages/email-compose.init.js"></script>
+        <!-- Responsive examples -->
+        <script src="~/assets/libs/datatables/dataTables.responsive.min.js"></script>
+        <script src="~/assets/libs/datatables/responsive.bootstrap4.min.js"></script>
+
+        <!-- Datatables init -->
+        <script src="~/assets/js/pages/datatables.init.js"></script>
+        <script src="~/assets/libs/sweetalert2/sweetalert2.min.js"></script>
+        <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+        <link href="~/css/sweetalert.css" rel="stylesheet" />
+        <script src="~/js/sweetalert.min.js"></script>
+
+
+        <div class="content-page">
+            <div class="content">
+
+                <!-- Start Content-->
+                <div class="container-fluid">
+                    @RenderBody()
+                </div>
+                <!--- end row -->
+
+            </div> <!-- end container-fluid -->
+
+        </div> <!-- end content -->
+    </div>
+
+    <!-- END wrapper -->
+    <!-- Right Sidebar -->
+    <div class="right-bar">
+        <div class="rightbar-title">
+            <a href="javascript:void(0);" class="right-bar-toggle float-right">
+                <i class="mdi mdi-close"></i>
+            </a>
+            <h4 class="font-16 m-0 text-white">Theme Customizer</h4>
+        </div>
+        <div class="slimscroll-menu">
+
+            <div class="p-3">
+                <div class="alert alert-warning" role="alert">
+                    <strong>Customize </strong> the overall color scheme, layout, etc.
+                </div>
+                <div class="mb-2">
+                    <img src="~/assets/images/layouts/light.png" class="img-fluid img-thumbnail" alt="">
+                </div>
+                <div class="custom-control custom-switch mb-3">
+                    <input type="checkbox" class="custom-control-input theme-choice" id="light-mode-switch" checked />
+                    <label class="custom-control-label" for="light-mode-switch">Light Mode</label>
+                </div>
+
+                <div class="mb-2">
+                    <img src="~/assets/images/layouts/dark.png" class="img-fluid img-thumbnail" alt="">
+                </div>
+                <div class="custom-control custom-switch mb-3">
+                    <input type="checkbox" class="custom-control-input theme-choice" id="dark-mode-switch" data-bsStyle="~/assets/css/bootstrap-dark.min.css"
+                           data-appStyle="~/assets/css/app-dark.min.css" />
+                    <label class="custom-control-label" for="dark-mode-switch">Dark Mode</label>
+                </div>
+
+                <div class="mb-2">
+                    <img src="~/assets/images/layouts/rtl.png" class="img-fluid img-thumbnail" alt="">
+                </div>
+                <div class="custom-control custom-switch mb-3">
+                    <input type="checkbox" class="custom-control-input theme-choice" id="rtl-mode-switch" data-appStyle="~/assets/css/app-rtl.min.css" />
+                    <label class="custom-control-label" for="rtl-mode-switch">RTL Mode</label>
+                </div>
+
+                <div class="mb-2">
+                    <img src="~/assets/images/layouts/dark-rtl.png" class="img-fluid img-thumbnail" alt="">
+                </div>
+                <div class="custom-control custom-switch mb-5">
+                    <input type="checkbox" class="custom-control-input theme-choice" id="dark-rtl-mode-switch" data-bsStyle="~/assets/css/bootstrap-dark.min.css"
+                           data-appStyle="~/assets/css/app-dark-rtl.min.css" />
+                    <label class="custom-control-label" for="dark-rtl-mode-switch">Dark RTL Mode</label>
+                </div>
+
+                <a href="https://1.envato.market/y2YAD" class="btn btn-danger btn-block mt-3" target="_blank"><i class="mdi mdi-download mr-1"></i> Download Now</a>
+            </div>
+        </div> <!-- end slimscroll-menu-->
+    </div>
+    <!-- /Right-bar -->
+    <!-- Right bar overlay-->
+    <div class="rightbar-overlay"></div>
+
+    @{
+        System.Globalization.CultureInfo cultureinfo =
+        new System.Globalization.CultureInfo("en-US");
+        string dt = DateTime.Now.ToString("yyyy", cultureinfo);
+    }
+
+    <footer class="footer">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    @dt &copy; BSMediator by <a href="">AicTec</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+
+
+</body>
+@RenderSection("Scripts", required: false)
+
+</html>
